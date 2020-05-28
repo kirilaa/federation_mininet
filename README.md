@@ -27,3 +27,12 @@ Workflow
 6. Domain 1 uses the provided end-point and initializes a VXLAN interface to the Domain 2 end-point
 7. Domain 2 deploys the host and creates a flow to the gateway, from the gateway creates a VXLAN to the Domain 1 end-point
 8. When the new host is deployed, Domain 2, notifes Domain 1 on specified IP address
+
+Steps
+-----
+
+1. Instantiate Mininet VMs \[**DONE**]
+2. Establish connectivity using VXLAN
+3. Establish connectivity from host (*h1*) in *Domain 1* to host (*h2*) in *Domain 2*, after starting Mininet in both domains.
+4. Establish connectivity to Ethereum blockchain from both domains.
+5. Final scenario
