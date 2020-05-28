@@ -1,1 +1,4 @@
-# federation_mininet
+DLT Federation using Mininet simulations
+=====
+Installation
+-----
