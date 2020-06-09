@@ -34,5 +34,6 @@ Steps
 1. Instantiate Mininet VMs \[**DONE**]
 2. Establish connectivity using VXLAN \[**DONE**]
 3. Establish connectivity from host (*h1*) in *Domain 1* to host (*h2*) in *Domain 2*, after starting Mininet in both domains. \[**DONE**]
+    - commands used in code/utils/host_commands_VXLAN.sh
 4. Establish connectivity to Ethereum blockchain from both domains. \[**DONE**]
 5. Final scenario
