@@ -10,6 +10,7 @@ from mininet.node import Controller
 from mininet.link import Intf
 from mininet.cli import CLI
 from mininet.log import setLogLevel, info
+import os
 
 def emptyNet():
 
@@ -21,12 +22,14 @@ def emptyNet():
     net.addController( 'c0' )
 
     info( '*** Adding hosts\n' )
-    h1 = net.addHost( 'h1', ip='10.0.0.1' )
-    h2 = net.addHost( 'h2', ip='10.0.0.2' )
+    h1 = net.addHost( 'h1', ip='10.0.0.3' )
+    h2 = net.addHost( 'h2', ip='10.0.0.4' )
 
     info( '*** Adding switch\n' )
     s1 = net.addSwitch( 's1' )
-    """Intf( 'vxlan0', node=s1 )"""    
+    stream = os.popen('sudo ip link add vxlan0 type vxlan id 40 remote 192.168.213.10 local 192.168.213.11 dev eth0 port 0 0')
+    stream = os.popen('sudo ifconfig vxlan0 up')
+    Intf( 'vxlan0', node=s1 )
 
     info( '*** Creating links\n' )
     net.addLink( h1, s1 )
@@ -36,8 +39,8 @@ def emptyNet():
     net.start()
 
     info( '*** Running CLI\n' )
-    CLI( net )
-
+    """CLI( net )"""
+    
     info( '*** Stopping network' )
     net.stop()
 
