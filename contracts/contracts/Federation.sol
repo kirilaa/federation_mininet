@@ -53,7 +53,7 @@ contract Federation {
         Operator storage current_operator = operator[msg.sender];
         Service storage current_service = service[_id];
         require(current_operator.registered == true, "Operator is not registered. Can not bid. Please register.");
-        require(current_service.requirements == 0, "Service ID for operator already exists");
+        require(current_service.id != _id, "Service ID for operator already exists");
 
         service[_id] = Service(msg.sender, _endpoint_consumer, _id, msg.sender,  _endpoint_consumer, _requirements, ServiceState.Open);
         emit ServiceAnnouncement(_requirements, _id);
@@ -67,12 +67,29 @@ contract Federation {
         return service[_id].state;
     }
 
+    function GetServiceInfo(bytes32 _id, bool provider, address call_address) public view returns (bytes32, bytes32, bytes32) {
+        Operator storage current_operator = operator[call_address];
+        Service storage current_service = service[_id];
+        require(current_operator.registered == true, "Operator is not registered. Can not look into. Please register.");
+        require(current_service.state >= ServiceState.Closed, "Service is still open or not exists");
+        if(provider == true) {
+                require(current_service.provider == call_address, "This domain is not a winner");
+                return(current_service.id, current_service.endpoint_consumer, current_service.req_info);
+        }
+        else {
+                require(current_service.creator == call_address, "This domain is not a creator");
+                return(current_service.id, current_service.endpoint_provider, current_service.req_info);
+        }
+    }
+
     function PlaceBid(bytes32 _id, uint32 _price, bytes32 _endpoint) public returns (uint256) {
         Operator storage current_operator = operator[msg.sender];
         Service storage current_service = service[_id];
         require(current_operator.registered == true, "Operator is not registered. Can not bid. Please register.");
         require(current_service.state == ServiceState.Open, "Service is closed or not exists");
-        uint256 max_bid_index = bids[_id].push(Bid(msg.sender, _endpoint, _price));
+        // uint256 max_bid_index = bids[_id].push(Bid(msg.sender, _price, _endpoint));
+        // uint256 max_bid_index = 0;
+        uint256 max_bid_index = bids[_id].push(Bid(msg.sender, _price, _endpoint));
         bidCount[_id] = max_bid_index;
         emit NewBid(_id, max_bid_index);
         return max_bid_index;
@@ -85,14 +102,14 @@ contract Federation {
         return bidCount[_id];
     }
 
-    function GetBids(bytes32 _id, uint256 bider_index, address _creator) public view returns (Bid[] bids) {
+    function GetBid(bytes32 _id, uint256 bider_index, address _creator) public view returns (address, uint, uint256) {
         Service storage current_service = service[_id];
         Bid[] storage current_bid_pool = bids[_id];
         require(current_service.id == _id, "Service not exists");
         require(current_service.creator == _creator, "Only service creator can look into the information");
-        require(current_bid_pool.length > 0, "No bids for requested Service");
-        // return (current_bid_pool[bider_index].bid_address, current_bid_pool[bider_index].price, bider_index);
-        return bids[_id];
+        require(bids[_id].length > 0, "No bids for requested Service");
+        return (current_bid_pool[bider_index].bid_address, current_bid_pool[bider_index].price, bider_index);
+        // return bids[_id];
     }
 
     function ChooseProvider(bytes32 _id, uint256 bider_index) public returns (bytes32 endpoint_provider) {
